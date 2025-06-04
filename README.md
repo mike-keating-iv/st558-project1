@@ -4,6 +4,6 @@
 
 Term: Summer 2025
 
-Professor: 
+Professor: Elijah Meyer
 
 Students: Mike Keating and Hayden Morgen
