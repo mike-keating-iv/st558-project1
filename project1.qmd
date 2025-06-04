@@ -1,0 +1,10 @@
+---
+title: "Project 1"
+author: "Mike Keating, Hayden Morgan"
+format: pdf
+editor: visual
+---
+
+# Project 1
+
+## Question 1
