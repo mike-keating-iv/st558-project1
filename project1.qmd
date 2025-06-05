@@ -7,9 +7,12 @@ editor: visual
 
 # Project 1
 
-<<<<<<< Updated upstream
+## First Steps
+
+Here we can first attempt each task/question and then refactor into functions later.
+
 ## Question 1
-=======
+
 ## First Steps
 
 ```{r}
@@ -27,6 +30,7 @@ Read in one section of the data. This data is available at <https://www4.stat.nc
 ```{r}
 #NOTE: The file has been downloaded and is in our data folder 
 # TODO: Read data
+# TODO: Hayden
 ```
 
 Select only the following columns:
@@ -39,6 +43,7 @@ Select only the following columns:
 
 ```{r}
 # TODO: Select columns
+# Hayden
 ```
 
 Display the first 5 rows of your new data set to show that you created this correctly. Note: Do not save over your new data set with just the first 5 rows, simply just show the first 5 rows.
@@ -49,6 +54,7 @@ Convert the data into long format where each row has only one enrollment value f
 
 ```{r}
 # TODO: Convert to long format
+# Hayden
 ```
 
 ## Question 3
@@ -60,6 +66,10 @@ One of the new columns should now correspond to the old column names that end wi
 -   Grab the first three characters and following four digits to create a new variable representing which measurement was grabbed.
 
 -   Hint: Check out the substr() function from base r
+
+    ```{r}
+    # TODO: Mike
+    ```
 
 ## Question 4
 
@@ -79,14 +89,17 @@ For the county level data, add a class to the tibble called county. Similarly, a
 
 Print the first 10 rows of each tibble by including county_tibble and state_tibble in your code chunk.
 
+```{r}
+# TODO Hayden
+```
+
 ## Question 5
 
 For the county level tibble, create a new variable that describes which state one of these county measurements corresponds to (the two digit abbreviation is fine, see substr()).
 
 ```{r}
 # TODO: Create state variable
-
-# this is a comment to test workflow in git
+# Mike
 ```
 
 ## Question 6
@@ -98,7 +111,7 @@ We can scrape a wikipedia table using the rvest package.
 Source: [StackOverflow](https://stackoverflow.com/questions/73696551/r-webscraping-error-arguments-imply-differing-number-of-rows)
 
 ```{r}
-
+# To do: Mike
 library(rvest) # rvest is in the tidyverse package
 # 
 
@@ -162,4 +175,3 @@ Write another function that takes in the output from Question 3 and creates the 
 ## Write Generic Function for Summarizing
 
 ## Put It Together
->>>>>>> Stashed changes
