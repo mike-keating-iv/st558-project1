@@ -7,6 +7,7 @@ editor: visual
 
 # Project 1
 
+
 ## First Steps
 
 Here we can first attempt each task/question and then refactor into functions later.
@@ -24,6 +25,7 @@ library("ggplot2")
 Here we can first attempt each task/question and then refactor into functions later.
 
 ## Question 1
+
 
 Read in one section of the data. This data is available at <https://www4.stat.ncsu.edu/~online/datasets/EDU01a.csv>.
 
@@ -75,13 +77,16 @@ One of the new columns should now correspond to the old column names that end wi
 
 Create two data sets
 
+
 -   one data set that contains only non-county data
 
 -   one data set that contains only county level data
 
+
 Note that all county measurements have the format “County Name, DD” where “DD” represents the state. This can be used to subset the data. I used the code grep(pattern = ", \\\\w\\\\w", Area_name) to get the indices corresponding to counties. For the county level data, add a class to the tibble called county. Similarly, add a class to the non-county data called state. This can be done by overwriting the class() you see on the object:
 
 For the county level data, add a class to the tibble called county. Similarly, add a class to the non-county data called state. This can be done by overwriting the class() you see on the object:
+
 
 ```{r}
 #class(your_county_tibble) <- c("county", class(your_county_tibble))
@@ -105,6 +110,7 @@ For the county level tibble, create a new variable that describes which state on
 ## Question 6
 
 For the non-county level tibble, create a new variable called “division” corresponding to the state’s classification of division [here.](https://en.wikipedia.org/wiki/List_of_regions_of_the_United_States) If row corresponds to a non-state (i.e. UNITED STATES), return ERROR for the division. Hint: Use %in% and consider if_else or case_when logic.
+
 
 We can scrape a wikipedia table using the rvest package.
 
@@ -175,3 +181,4 @@ Write another function that takes in the output from Question 3 and creates the 
 ## Write Generic Function for Summarizing
 
 ## Put It Together
+
