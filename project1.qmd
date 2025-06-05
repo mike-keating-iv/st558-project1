@@ -10,14 +10,10 @@ editor: visual
 
 ## First Steps
 
-Here we can first attempt each task/question and then refactor into functions later.
-
-## Question 1
-
-## First Steps
-
 ```{r}
 # Dependencies
+#| warnings: false
+#| messages: false
 library("tidyverse")
 library("ggplot2")
 ```
@@ -26,14 +22,7 @@ Here we can first attempt each task/question and then refactor into functions la
 
 ## Question 1
 
-
 Read in one section of the data. This data is available at <https://www4.stat.ncsu.edu/~online/datasets/EDU01a.csv>.
-
-```{r}
-#NOTE: The file has been downloaded and is in our data folder 
-# TODO: Read data
-# TODO: Hayden
-```
 
 Select only the following columns:
 
@@ -44,11 +33,24 @@ Select only the following columns:
 -   Any column that ends in "D"
 
 ```{r}
-# TODO: Select columns
-# Hayden
+#NOTE: The file has been downloaded and is in our data folder 
+# TODO: Read data
+# TODO: Hayden
+
+edu01a <- read_csv("data/EDU01a.csv", col_select = c(Area_name, STCOU, ends_with("D"))) |>
+  rename(
+    area_name = Area_name
+  )
+
 ```
 
 Display the first 5 rows of your new data set to show that you created this correctly. Note: Do not save over your new data set with just the first 5 rows, simply just show the first 5 rows.
+
+```{r}
+
+head(edu01a, 5)
+
+```
 
 ## Question 2
 
@@ -57,6 +59,13 @@ Convert the data into long format where each row has only one enrollment value f
 ```{r}
 # TODO: Convert to long format
 # Hayden
+
+edu01a_long <- edu01a |>
+                  pivot_longer(cols = 3:12,
+                               names_to = "EDU_D",
+                               values_to = "Enrollment Value")
+
+head(edu01a_long, 5)
 ```
 
 ## Question 3
