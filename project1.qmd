@@ -13,8 +13,8 @@ editor: visual
 # Dependencies
 #| warnings: false
 #| messages: false
-library("tidyverse")
-library("ggplot2")
+suppressWarnings(library("tidyverse"))
+suppressWarnings(library("ggplot2"))
 ```
 
 Here we can first attempt each task/question and then refactor into functions later.
@@ -36,7 +36,7 @@ Select only the following columns:
 # TODO: Read data
 # TODO: Hayden
 
-edu01a <- read_csv("data/EDU01a.csv", col_select = c(Area_name, STCOU, ends_with("D"))) |>
+edu01a <- read_csv("data/EDU01a.csv", col_select = c(Area_name, STCOU, ends_with("D")), show_col_types = FALSE) |>
   rename(
     area_name = Area_name
   )
