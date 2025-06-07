@@ -245,7 +245,7 @@ select_and_convert <- function(data_path_in_quotes, value_colname = "Enrollment"
                 pivot_longer(cols = 3:12,
                              names_to = "EDU_D",
                              values_to = value_colname)
-  
+  print(head(edu_long, 5))
   return(edu_long)
 }
 
