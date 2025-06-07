@@ -305,7 +305,24 @@ get_division <- function(state_tibble){
 
 Write another function that takes in the output from Step 3 and creates the two tibbles in Step 4, calls the above two functions (to perform Steps 5 and 6), and returns two final tibbles.Wrap everything into one function call
 
+```{r}
+#TODO: Hayden
+step4_placeholder_fxn <- function(long_data){
+  return("Function not implemented")
+}
+```
+
 ## Wrap Everything in One Function Call
+
+```{r}
+# In progress
+clean_data_wrapper <- function(url, value = "Enrollment"){
+  result <- select_and_convert(url, value_colname = value) |>
+    get_year_and_measurement() |> 
+    step4_placeholder_fxn() 
+    
+}
+```
 
 ## Call It and Combine Data
 
