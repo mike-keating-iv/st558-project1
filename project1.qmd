@@ -62,7 +62,7 @@ Convert the data into long format where each row has only one enrollment value f
 edu01a_long <- edu01a |>
                   pivot_longer(cols = 3:12,
                                names_to = "EDU_D",
-                               values_to = "Enrollment Value")
+                               values_to = "Enrollment")
 
 head(edu01a_long, 5)
 ```
@@ -84,10 +84,10 @@ One of the new columns should now correspond to the old column names that end wi
     # It looks like every year is pre-2000, but lets plan for up to 2025
     # This assumes there is no data from 1925 or earlier
     # Treating year as numeric for now
-    edu01a_long <- edu01a_long |> mutate(year = as.numeric(substr(EDU_D, 8,9)), measurement = substr(EDU_D, 1,7)) |> 
+    long_updated <- edu01a_long |> mutate(year = as.numeric(substr(EDU_D, 8,9)), measurement = substr(EDU_D, 1,7)) |> 
       mutate(year = ifelse(year < 26, year + 2000, year + 1900))
 
-    head(edu01a_long)
+    head(long_updated)
 
     ```
 
@@ -99,18 +99,31 @@ Create two data sets
 
 -   one data set that contains only county level data
 
-Note that all county measurements have the format “County Name, DD” where “DD” represents the state. This can be used to subset the data. I used the code grep(pattern = ", \\\\w\\\\w", Area_name) to get the indices corresponding to counties. For the county level data, add a class to the tibble called county. Similarly, add a class to the non-county data called state. This can be done by overwriting the class() you see on the object:
+Note that all county measurements have the format “County Name, DD” where “DD” represents the state. This can be used to subset the data. I used the code grep(pattern = ", \\w\\w", Area_name) to get the indices corresponding to counties. For the county level data, add a class to the tibble called county. Similarly, add a class to the non-county data called state. This can be done by overwriting the class() you see on the object: class(your_county_tibble) <- c("county", class(your_county_tibble))
 
 For the county level data, add a class to the tibble called county. Similarly, add a class to the non-county data called state. This can be done by overwriting the class() you see on the object:
 
 ```{r}
-#class(your_county_tibble) <- c("county", class(your_county_tibble))
+#For county tibble
+county_match <- grep(pattern = ", \\w\\w", long_updated$area_name)
+county_tibble <- long_updated[county_match,]
+class(county_tibble) <- c("county", class(county_tibble))
+
+#For state tibble
+state_match <- grep(pattern = ", \\w\\w", long_updated$area_name, invert = T)
+state_tibble <- long_updated[state_match,]
+class(state_tibble) <- c("state", class(state_tibble))
+
 ```
 
 Print the first 10 rows of each tibble by including county_tibble and state_tibble in your code chunk.
 
 ```{r}
 # TODO Hayden
+
+head(county_tibble, 10)
+head(state_tibble, 10)
+
 ```
 
 ## Question 5
@@ -159,10 +172,6 @@ divisions
 Note how all states in any given region are stored in the same cell, separated by spaces. We can either transform the States column by splitting up the states or leave as is and process the state correctly when reading our other datasets.
 
 ```{r}
-
-```
-
-```{r}
 # TODO: Assign division based on the state-division pairs we read in
 ```
 
@@ -171,6 +180,27 @@ Note how all states in any given region are stored in the same cell, separated b
 ### Function 1
 
 Write one function that combines Questions 1 and 2 above. Give an optional argument (that is it has a default value) that allows the user to specify the name of the column representing the value (enrollment for these data sets).
+
+```{r}
+
+select_and_convert <- function(data_path_in_quotes, value_colname = "Enrollment"){
+  edu <- read_csv(data_path_in_quotes, col_select = c(Area_name, STCOU, ends_with("D")), show_col_types = FALSE) |>
+  rename(
+    area_name = Area_name
+  )
+  
+  edu_long <- edu |>
+                pivot_longer(cols = 3:12,
+                             names_to = "EDU_D",
+                             values_to = value_colname)
+  
+  return(head(edu_long, 5))
+}
+
+select_and_convert("data/EDU01b.csv")
+
+```
+
 
 ### Function 2
 
