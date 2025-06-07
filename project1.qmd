@@ -17,9 +17,9 @@ suppressWarnings(library("tidyverse"))
 suppressWarnings(library("ggplot2"))
 ```
 
-Here we can first attempt each task/question and then refactor into functions later.
+Here we can first attempt each task/Step and then refactor into functions later.
 
-## Question 1
+## Step 1: Select Data
 
 Read in one section of the data. This data is available at <https://www4.stat.ncsu.edu/~online/datasets/EDU01a.csv>.
 
@@ -51,7 +51,7 @@ head(edu01a, 5)
 
 ```
 
-## Question 2
+## Step 2: Long Format
 
 Convert the data into long format where each row has only one enrollment value for that Area_name. Display the first 5 rows of your new data set to show that you created this correctly.
 
@@ -67,7 +67,7 @@ edu01a_long <- edu01a |>
 head(edu01a_long, 5)
 ```
 
-## Question 3
+## Step 3: Assign Year and State
 
 One of the new columns should now correspond to the old column names that end with a “D”. All columns in these census data files will have this similar format. The first three characters represent the survey with the next four representing the type of value you have from that survey. The last two digits prior to the “D” represent the year of the measurement. For more about the variables see the data information sheet Mastdata.xls).
 
@@ -91,7 +91,7 @@ One of the new columns should now correspond to the old column names that end wi
 
     ```
 
-## Question 4
+## Step 4: Split County and Non-County
 
 Create two data sets
 
@@ -126,7 +126,7 @@ head(state_tibble, 10)
 
 ```
 
-## Question 5
+## Step 5: Assign State to County Tibble
 
 For the county level tibble, create a new variable that describes which state one of these county measurements corresponds to (the two digit abbreviation is fine, see substr()).
 
@@ -152,15 +152,17 @@ county_tibble <- county_tibble |>
   mutate(state = str_trim(str_split(area_name, ",", simplify = TRUE)[,-1]))
 ```
 
-## Question 6
+## Step 6: Assign Division to State Tibble
 
 For the non-county level tibble, create a new variable called “division” corresponding to the state’s classification of division [here.](https://en.wikipedia.org/wiki/List_of_regions_of_the_United_States) If row corresponds to a non-state (i.e. UNITED STATES), return ERROR for the division. Hint: Use %in% and consider if_else or case_when logic.
+
+Instead of writing ifelse statements manually for every division, we are going to instead read the divisions straight from Wikipedia and assign the correct division to any given state.
 
 We can scrape a Wikipedia table using the rvest package.
 
 Source: [StackOverflow](https://stackoverflow.com/questions/73696551/r-webscraping-error-arguments-imply-differing-number-of-rows)
 
-```{r}
+```{r, message=FALSE}
 # To do: Mike
 library(rvest) # rvest is in the tidyverse package
 # 
@@ -168,7 +170,7 @@ library(rvest) # rvest is in the tidyverse package
 # Since we don't want to always have to connect to the url to read our data, 
 # let's check if we have already saved it
 if (file.exists("data/divisions.csv")){
-  print("Division data already downloaded")
+  print("Division data already downloaded from Wikipedia")
   print("Reading .csv file")
   divisions <- read_csv("data/divisions.csv")
 } else {
@@ -188,40 +190,48 @@ divisions
 
 Note how all states in any given region are stored in the same cell, separated by spaces. We can either transform the States column by splitting up the states or leave as is and process the state correctly when reading our other datasets.
 
-We can look up state abbreviations/names using built in R constants, and filter columns by the state in our divisions tibble by using if_any and str_detect.
-
-Source: [StackOverflow](https://stackoverflow.com/questions/5411979/state-name-to-abbreviation)
+We can filter columns by the state in our divisions tibble by using if_any and str_detect.
 
 ```{r}
 # TODO: Assign division based on the state-division pairs we read in
 # Let's make a function to make this easier
 
-get_division <- function(state_abb){
-  # Get the state name for abbreviation
-  state_name <- state.name[match(state_abb, state.abb)]
+divisions$States <-divisions$States |> toupper() # make sure uppercase to make matching easier
+
+get_division <- function(state_name){
   
   # Check for the state name in the divisions df and filter
   # Assumes state only appears once in the tibble
-  division <- divisions |> filter(if_any(States, ~str_detect(.x, state_name)))
-
-  return(division$Division)
+  # Add word boundaries to our regex to avoid substring matching
+  # E.g "Kansas" shouldnt match "Arkansas"
+  match_pattern <- paste0("\\b", toupper(state_name), "\\b")
+  division_row <- divisions |> 
+    filter(if_any(States, ~str_detect(.x, match_pattern)))
+  division <- division_row$Division
+  # Return "ERROR" if there is no match to state
+  if (length(division) == 0){
+    return ("ERROR")
+  }
+  else {
+    return (division)
+  }
   
 }
-
-
-get_division("NC")
 
 ```
 
 ```{r}
 # Apply our function to the non county tibble
+
+state_tibble <- state_tibble |> mutate(division = map_chr(area_name, get_division))
+tail(state_tibble)
 ```
 
 ## Function Wrapping
 
-### Function 1
+### Function 1: Step 1, Step 2
 
-Write one function that combines Questions 1 and 2 above. Give an optional argument (that is it has a default value) that allows the user to specify the name of the column representing the value (enrollment for these data sets).
+Write one function that combines Steps 1 and 2 above. Give an optional argument (that is it has a default value) that allows the user to specify the name of the column representing the value (enrollment for these data sets).
 
 ```{r}
 
@@ -243,36 +253,57 @@ select_and_convert("data/EDU01b.csv")
 
 ```
 
-### Function 2
+### Function 2: Step 3
 
-Write a function that takes the output from Question 2 and performs Question 3
+Write a function that takes the output from Step 2 and performs Step 3
 
 ```{r}
 
-get_year_and_measurement <- function(df){
-  
-   return(
-     df |> 
-       mutate(year = as.numeric(substr(EDU_D, 8,9)), measurement = substr(EDU_D, 1,7)) |>
-       mutate(year = ifelse(year < 26, year + 2000, year + 1900))
-     )
-  
+get_year_and_measurement <-function(long_data){
+  print("Updating long data with year and measurement")
+  long_data_updated <- long_data |> 
+    mutate(year = as.numeric(substr(EDU_D, 8,9)), 
+           measurement = substr(EDU_D, 1,7)) |> 
+    mutate(year = ifelse(year < 26, year + 2000, year + 1900))
+     
+  return (long_data_updated)
+
 }
 
-get_year_and_measurement(edu01a_long)
 ```
 
-### Function 3
+### Function 3: Step 5
 
-Write a function to do Question 5
+Write a function to do Step 5
 
-### Function 4
+```{r}
+get_state <- function(county_tibble){
+  print("Assigning State to county tibble")
+  county_tibble_with_state <- county_tibble |> 
+  mutate(state = str_trim(str_split(area_name, ",", simplify = TRUE)[,-1]))
+  
+  return(county_tibble_with_state)
+}
+```
+
+### Function 4: Step 6
 
 Write a function to do step 6
 
-### Function 5
+```{r}
+get_division <- function(state_tibble){
+  print("Assigning division to state tibble")
+  state_tibble_with_division <- state_tibble |> 
+    mutate(division = map_chr(area_name, get_division))
+  
+  return(state_tibble_with_division)
 
-Write another function that takes in the output from Question 3 and creates the two tibbles in Question 4, calls the above two functions (to perform Questions 5 and 6), and returns two final tibbles.Wrap everything into one function call
+}
+```
+
+### Function 5: Step 4
+
+Write another function that takes in the output from Step 3 and creates the two tibbles in Step 4, calls the above two functions (to perform Steps 5 and 6), and returns two final tibbles.Wrap everything into one function call
 
 ## Wrap Everything in One Function Call
 
