@@ -9,7 +9,7 @@ editor: visual
 
 ## First Steps
 
-```{r}
+```{r, message=FALSE}
 # Dependencies
 #| warnings: false
 #| messages: false
@@ -99,7 +99,7 @@ Create two data sets
 
 -   one data set that contains only county level data
 
-Note that all county measurements have the format “County Name, DD” where “DD” represents the state. This can be used to subset the data. I used the code grep(pattern = ", \\w\\w", Area_name) to get the indices corresponding to counties. For the county level data, add a class to the tibble called county. Similarly, add a class to the non-county data called state. This can be done by overwriting the class() you see on the object: class(your_county_tibble) <- c("county", class(your_county_tibble))
+Note that all county measurements have the format “County Name, DD” where “DD” represents the state. This can be used to subset the data. I used the code grep(pattern = ", \\w\\w", Area_name) to get the indices corresponding to counties. For the county level data, add a class to the tibble called county. Similarly, add a class to the non-county data called state. This can be done by overwriting the class() you see on the object: class(your_county_tibble) \<- c("county", class(your_county_tibble))
 
 For the county level data, add a class to the tibble called county. Similarly, add a class to the non-county data called state. This can be done by overwriting the class() you see on the object:
 
@@ -131,15 +131,32 @@ head(state_tibble, 10)
 For the county level tibble, create a new variable that describes which state one of these county measurements corresponds to (the two digit abbreviation is fine, see substr()).
 
 ```{r}
+
+# I prefer to split the string based on delimiter (comma) instead of indexing
+# Example
+string <- "Autauga, AL"
+split <- str_split(string, ",", simplify = TRUE)[,-1] # We return a chr matrix, and we only care about the last (second) entry
+
+print(split)
+print("Removing space")
+clean_split <- str_trim(split)
+print(clean_split)
+
+```
+
+```{r}
 # TODO: Create state variable
 # Mike
+
+county_tibble <- county_tibble |> 
+  mutate(state = str_trim(str_split(area_name, ",", simplify = TRUE)[,-1]))
 ```
 
 ## Question 6
 
 For the non-county level tibble, create a new variable called “division” corresponding to the state’s classification of division [here.](https://en.wikipedia.org/wiki/List_of_regions_of_the_United_States) If row corresponds to a non-state (i.e. UNITED STATES), return ERROR for the division. Hint: Use %in% and consider if_else or case_when logic.
 
-We can scrape a wikipedia table using the rvest package.
+We can scrape a Wikipedia table using the rvest package.
 
 Source: [StackOverflow](https://stackoverflow.com/questions/73696551/r-webscraping-error-arguments-imply-differing-number-of-rows)
 
@@ -171,8 +188,33 @@ divisions
 
 Note how all states in any given region are stored in the same cell, separated by spaces. We can either transform the States column by splitting up the states or leave as is and process the state correctly when reading our other datasets.
 
+We can look up state abbreviations/names using built in R constants, and filter columns by the state in our divisions tibble by using if_any and str_detect.
+
+Source: [StackOverflow](https://stackoverflow.com/questions/5411979/state-name-to-abbreviation)
+
 ```{r}
 # TODO: Assign division based on the state-division pairs we read in
+# Let's make a function to make this easier
+
+get_division <- function(state_abb){
+  # Get the state name for abbreviation
+  state_name <- state.name[match(state_abb, state.abb)]
+  
+  # Check for the state name in the divisions df and filter
+  # Assumes state only appears once in the tibble
+  division <- divisions |> filter(if_any(States, ~str_detect(.x, state_name)))
+
+  return(division$Division)
+  
+}
+
+
+get_division("NC")
+
+```
+
+```{r}
+# Apply our function to the non county tibble
 ```
 
 ## Function Wrapping
@@ -200,7 +242,6 @@ select_and_convert <- function(data_path_in_quotes, value_colname = "Enrollment"
 select_and_convert("data/EDU01b.csv")
 
 ```
-
 
 ### Function 2
 
