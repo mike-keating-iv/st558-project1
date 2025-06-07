@@ -249,8 +249,6 @@ select_and_convert <- function(data_path_in_quotes, value_colname = "Enrollment"
   return(edu_long)
 }
 
-select_and_convert("data/EDU01b.csv")
-
 ```
 
 ### Function 2: Step 3
@@ -303,13 +301,26 @@ get_division <- function(state_tibble){
 
 ### Function 5: Step 4
 
-Write another function that takes in the output from Step 3 and creates the two tibbles in Step 4, calls the above two functions (to perform Steps 5 and 6), and returns two final tibbles.Wrap everything into one function call
+Write another function that takes in the output from Step 3 and creates the two tibbles in Step 4, calls the above two functions (to perform Steps 5 and 6), and returns two final tibbles.
 
 ```{r}
 #TODO: Hayden
-step4_placeholder_fxn <- function(long_data){
-  return("Function not implemented")
+
+returning_final_tibbles <- function(long_updated_data){
+  county_match <- grep(pattern = ", \\w\\w", long_updated_data$area_name)
+  county_tibble <- long_updated_data[county_match,]
+  class(county_tibble) <- c("county", class(county_tibble))
+  
+  state_match <- grep(pattern = ", \\w\\w", long_updated_data$area_name, invert = T)
+  state_tibble <- long_updated_data[state_match,]
+  class(state_tibble) <- c("state", class(state_tibble))
+  
+  county_tibble_final <- get_state(county_tibble)
+  state_tibble_final <- get_division(state_tibble)
+  
+  return(list(county_tibble_final, state_tibble_final))
 }
+
 ```
 
 ## Wrap Everything in One Function Call
