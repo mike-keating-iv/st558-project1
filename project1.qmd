@@ -246,7 +246,7 @@ select_and_convert <- function(data_path_in_quotes, value_colname = "Enrollment"
                              names_to = "EDU_D",
                              values_to = value_colname)
   
-  return(head(edu_long, 5))
+  return(edu_long)
 }
 
 select_and_convert("data/EDU01b.csv")
