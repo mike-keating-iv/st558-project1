@@ -198,7 +198,7 @@ We can filter columns by the state in our divisions tibble by using if_any and s
 
 divisions$States <-divisions$States |> toupper() # make sure uppercase to make matching easier
 
-get_division <- function(state_name){
+get_division_for_state <- function(state_name){
   
   # Check for the state name in the divisions df and filter
   # Assumes state only appears once in the tibble
@@ -223,7 +223,7 @@ get_division <- function(state_name){
 ```{r}
 # Apply our function to the non county tibble
 
-state_tibble <- state_tibble |> mutate(division = map_chr(area_name, get_division))
+state_tibble_test <- state_tibble |> mutate(division = map_chr(area_name, get_division_for_state))
 tail(state_tibble)
 ```
 
@@ -292,11 +292,13 @@ Write a function to do step 6
 get_division <- function(state_tibble){
   print("Assigning division to state tibble")
   state_tibble_with_division <- state_tibble |> 
-    mutate(division = map_chr(area_name, get_division))
+    mutate(division = map_chr(area_name, get_division_for_state))
   
   return(state_tibble_with_division)
 
 }
+
+state_tibble
 ```
 
 ### Function 5: Step 4
@@ -330,12 +332,17 @@ returning_final_tibbles <- function(long_updated_data){
 clean_data_wrapper <- function(url, value = "Enrollment"){
   result <- select_and_convert(url, value_colname = value) |>
     get_year_and_measurement() |> 
-    step4_placeholder_fxn() 
+    returning_final_tibbles() 
     
 }
 ```
 
 ## Call It and Combine Data
+
+```{r}
+data <- clean_data_wrapper("https://www4.stat.ncsu.edu/~online/datasets/EDU01b.csv")
+data
+```
 
 ## Write Generic Function for Summarizing
 
