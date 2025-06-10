@@ -344,7 +344,9 @@ data <- clean_data_wrapper("https://www4.stat.ncsu.edu/~online/datasets/EDU01b.c
 data
 ```
 
-## Write Generic Function for Summarizing
+## Write Generic Functions for Summarizing
+
+### Plotting State Data
 
 Let's show commas in our y-axis to make it more readable.
 
@@ -372,6 +374,31 @@ plot.state <- function(df, var_name = "Enrollment"){
 
 ```{r}
 plot(state_tibble_test)
+```
+
+### Plotting County Data
+
+```{r}
+plot.county <- function(df, var_name = "Enrollment", 
+                        state = "NC", 
+                        top_or_bottom = "top", n = 5){
+  # Create title base on our supplied var name
+  plot_title <- paste0(top_or_bottom," ", var_name, " in ", state )
+  # TODO: IN PROGRESS
+  df |> 
+    filter({{state}} == state ) |>
+    group_by(year, area_name) |> 
+    summarize(mean_enrollment = mean(get(var_name))) |>
+    ggplot(aes(year,mean_enrollment)) +
+    geom_line() + 
+    labs(title = plot_title, x = "Year", y = paste0("Mean ", var_name)) +
+    guides(color = guide_legend("U.S. Division")) + # Rename Legend
+    scale_y_continuous(label=comma)
+}
+```
+
+```{r}
+plot(county_tibble)
 ```
 
 ## Put It Together
