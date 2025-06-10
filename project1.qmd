@@ -353,6 +353,12 @@ Let's show commas in our y-axis to make it more readable.
 Source: [StackOverflow](https://stackoverflow.com/questions/52602503/display-an-axis-value-in-millions-in-ggplot)
 
 ```{r}
+# We will use the library scales
+suppressMessages(library(scales))
+```
+
+```{r}
+
 plot.state <- function(df, var_name = "Enrollment"){
   # Create title base on our supplied var name
   plot_title <- paste0("Mean ", var_name, " by Division")
@@ -387,13 +393,16 @@ plot.county <- function(df, var_name = "Enrollment",
   # TODO: IN PROGRESS
   df |> 
     filter({{state}} == state ) |>
-    group_by(year, area_name) |> 
-    summarize(mean_enrollment = mean(get(var_name))) |>
-    ggplot(aes(year,mean_enrollment)) +
-    geom_line() + 
-    labs(title = plot_title, x = "Year", y = paste0("Mean ", var_name)) +
-    guides(color = guide_legend("U.S. Division")) + # Rename Legend
-    scale_y_continuous(label=comma)
+    group_by(area_name) |> 
+    summarize(mean_enrollment = mean(get(var_name))) |> 
+    arrange(mean_enrollment, ascending=TRUE)
+  
+  
+   # ggplot(aes(year,mean_enrollment, color = area_name)) +
+    #geom_line() + 
+    #labs(title = plot_title, x = "Year", y = paste0("Mean ", var_name)) +
+    #guides(color = guide_legend("U.S. Division")) + # Rename Legend
+    #scale_y_continuous(label=comma)
 }
 ```
 
