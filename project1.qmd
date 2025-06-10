@@ -352,17 +352,19 @@ Source: [StackOverflow](https://stackoverflow.com/questions/52602503/display-an-
 
 ```{r}
 plot.state <- function(df, var_name = "Enrollment"){
+  # Create title base on our supplied var name
   plot_title <- paste0("Mean ", var_name, " by Division")
-  
   
   df |> 
     filter(division != "ERROR") |>
     group_by(division, year) |> 
     summarize(mean_enrollment = mean(get(var_name))) |>
-    mutate(division = as.factor(division)) |>
+    mutate(division = as.factor(division)) |> # TODO: Make this factor when reading data??
+    # Plotting functions
     ggplot(aes(year,mean_enrollment, color = division)) +
-    geom_line() + labs(title = plot_title, x = "Year", y = paste0("Mean ", var_name)) +
-    guides(color = guide_legend("U.S. Division")) +
+    geom_line() + 
+    labs(title = plot_title, x = "Year", y = paste0("Mean ", var_name)) +
+    guides(color = guide_legend("U.S. Division")) + # Rename Legend
     scale_y_continuous(label=comma)
     
 }
