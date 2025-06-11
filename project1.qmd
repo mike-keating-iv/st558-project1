@@ -379,7 +379,8 @@ plot.state <- function(df, var_name = "Enrollment"){
 ```
 
 ```{r}
-plot(state_tibble_test)
+# Testing with wrapper data
+plot(data[[2]])
 ```
 
 ### Plotting County Data
@@ -388,26 +389,44 @@ plot(state_tibble_test)
 plot.county <- function(df, var_name = "Enrollment", 
                         state = "NC", 
                         top_or_bottom = "top", n = 5){
-  # Create title base on our supplied var name
-  plot_title <- paste0(top_or_bottom," ", var_name, " in ", state )
-  # TODO: IN PROGRESS
-  df |> 
+  # Create title based on our supplied var name
+  plot_title <- paste0(ifelse(top_or_bottom == "top", "Highest", "Lowest")," ", 
+                       var_name, " in ", state, " by County")
+  
+  # Helper function, not sure if this is the most efficient way to handle this
+  display_function <- function(df, col, top_or_bottom){
+    if (top_or_bottom == "top"){
+      df |> arrange(desc({{col}})) # Nested brackets to refer to the column
+    }
+    else{
+      df |> arrange({{col}})
+    }
+  }
+  
+  # Get n top or bottom counties
+  counties <- df |> 
     filter({{state}} == state ) |>
     group_by(area_name) |> 
-    summarize(mean_enrollment = mean(get(var_name))) |> 
-    arrange(mean_enrollment, ascending=TRUE)
+    summarize(mean_enrollment = mean(get(var_name))) |> display_function(mean_enrollment, top_or_bottom) |> head(n)
   
-  
-   # ggplot(aes(year,mean_enrollment, color = area_name)) +
-    #geom_line() + 
-    #labs(title = plot_title, x = "Year", y = paste0("Mean ", var_name)) +
-    #guides(color = guide_legend("U.S. Division")) + # Rename Legend
-    #scale_y_continuous(label=comma)
+  # Filter df by counties and plot
+  df |> filter(df$area_name %in% counties$area_name) |> group_by(year, area_name) |>
+    mutate(mean_enrollment = mean(get(var_name))) |>
+    ggplot(aes(year,mean_enrollment, color = area_name)) + geom_line() + 
+    labs(title = plot_title, x = "Year", y = paste0("Mean ", var_name)) +
+    guides(color = guide_legend("Location")) + 
+    scale_y_continuous(label=comma)
 }
+
 ```
 
 ```{r}
-plot(county_tibble)
+# Test Functions
+plot(county_tibble, top_or_bottom = "bottom", n = 10, state = "SC")
 ```
 
 ## Put It Together
+
+```{r}
+#TODO Morgan
+```
