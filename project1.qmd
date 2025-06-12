@@ -386,9 +386,23 @@ plot(data[[2]])
 ### Plotting County Data
 
 ```{r}
+state.name[match("North Carolina", state.abb)]
+```
+
+```{r}
 plot.county <- function(df, var_name = "Enrollment", 
                         state = "NC", 
                         top_or_bottom = "top", n = 5){
+  # Argument validation
+  # Try to match by state
+  if (is.na(state.name[match(state, state.abb)])){
+    stop("Argument Error: state must be two letter state abb, e.g. 'NC' ")
+  }
+  if (!(all.equal(n, as.integer(n))) == TRUE ){
+    stop("Argument Error: Please use an integer for n")
+  }
+
+  
   # Create title based on our supplied var name
   plot_title <- paste0(ifelse(top_or_bottom == "top", "Highest", "Lowest")," ", 
                        var_name, " in ", state, " by County")
@@ -398,9 +412,11 @@ plot.county <- function(df, var_name = "Enrollment",
     if (top_or_bottom == "top"){
       df |> arrange(desc({{col}})) # Nested brackets to refer to the column
     }
-    else{
+    else if(top_or_bottom == "bottom"){
       df |> arrange({{col}})
     }
+    else
+      stop("Argument Error: top_or_bottom must be 'top' or 'bottom'")
   }
   
   # Get n top or bottom counties
@@ -422,7 +438,7 @@ plot.county <- function(df, var_name = "Enrollment",
 
 ```{r}
 # Test Functions
-plot(county_tibble, top_or_bottom = "bottom", n = 10, state = "SC")
+plot(county_tibble, top_or_bottom = "top", n = 2, state = "NC")
 ```
 
 ## Put It Together
