@@ -7,19 +7,36 @@ editor: visual
 
 # Project 1
 
-## First Steps
+## Setting Things Up
 
-```{r, message=FALSE}
-# Dependencies
-#| warnings: false
-#| messages: false
-suppressWarnings(library("tidyverse"))
-suppressWarnings(library("ggplot2"))
+## Creating the Repo
+
+- GitHub repo created by Mike 
+
+- RStudio project created
+
+- Hayden added as a collaborator and membership accepted
+
+- Format set to PDF 
+
+## Collaboration Workflow
+
+- Task distribution and timeline established
+
+- Decided to each work on own branches 
+
+## .qmd Format
+
+All messages and warnings that come from librarying packages should be turned off using the appropriate
+code chunk option.
+```{r, message=FALSE, warning=FALSE}
+library("tidyverse")
+library("ggplot2")
 ```
 
-Here we can first attempt each task/Step and then refactor into functions later.
+## First Steps 
 
-## Step 1: Select Data
+## Question 1: Selecting Columns 
 
 Read in one section of the data. This data is available at <https://www4.stat.ncsu.edu/~online/datasets/EDU01a.csv>.
 
@@ -30,44 +47,43 @@ Select only the following columns:
 -   STCOU
 
 -   Any column that ends in "D"
-
 ```{r}
-#NOTE: The file has been downloaded and is in our data folder 
-# TODO: Read data
-# TODO: Hayden
+#TODO: Hayden
 
-edu01a <- read_csv("data/EDU01a.csv", col_select = c(Area_name, STCOU, ends_with("D")), show_col_types = FALSE) |>
+#NOTE: EDU01a, EDU01b, divisions, and Mastdata files are all in the project folder. 
+
+edu01a <- read_csv("data/EDU01a.csv", 
+                   col_select = c(Area_name, STCOU, ends_with("D")),
+                    show_col_types = FALSE) |>
   rename(
     area_name = Area_name
   )
-
 ```
 
 Display the first 5 rows of your new data set to show that you created this correctly. Note: Do not save over your new data set with just the first 5 rows, simply just show the first 5 rows.
-
 ```{r}
+#TODO: Hayden
 
 head(edu01a, 5)
-
 ```
 
-## Step 2: Long Format
+## Question 2: Converting to Long Format
 
 Convert the data into long format where each row has only one enrollment value for that Area_name. Display the first 5 rows of your new data set to show that you created this correctly.
-
 ```{r}
-# TODO: Convert to long format
-# Hayden
+#TODO: Hayden
 
 edu01a_long <- edu01a |>
-                  pivot_longer(cols = 3:12,
-                               names_to = "EDU_D",
+                  pivot_longer(cols = 3:12, #retain area_name + STCOU
+                               names_to = "EDU_D", #named after unique
+                               # ending "D" per Q1
                                values_to = "Enrollment")
 
-head(edu01a_long, 5)
+#Displaying first 5 rows below
+head(edu01a_long, 5) 
 ```
 
-## Step 3: Assign Year and State
+## Question 3: Assign Year and State
 
 One of the new columns should now correspond to the old column names that end with a “D”. All columns in these census data files will have this similar format. The first three characters represent the survey with the next four representing the type of value you have from that survey. The last two digits prior to the “D” represent the year of the measurement. For more about the variables see the data information sheet Mastdata.xls).
 
@@ -76,22 +92,22 @@ One of the new columns should now correspond to the old column names that end wi
 -   Grab the first three characters and following four digits to create a new variable representing which measurement was grabbed.
 
 -   Hint: Check out the substr() function from base r
-
     ```{r}
-    # TODO: Mike
+    #TODO: Mike
 
     # Parse the string to pull out year
-    # It looks like every year is pre-2000, but lets plan for up to 2025
+    # It looks like every year is pre-2000, but let's plan for up to 2025
     # This assumes there is no data from 1925 or earlier
     # Treating year as numeric for now
-    long_updated <- edu01a_long |> mutate(year = as.numeric(substr(EDU_D, 8,9)), measurement = substr(EDU_D, 1,7)) |> 
+long_updated <- edu01a_long |> mutate(year = as.numeric(substr(EDU_D, 8,9)), 
+      measurement = substr(EDU_D, 1,7)) |> 
       mutate(year = ifelse(year < 26, year + 2000, year + 1900))
 
     head(long_updated)
 
     ```
 
-## Step 4: Split County and Non-County
+## Question 4: Split County and Non-County
 
 Create two data sets
 
@@ -99,11 +115,10 @@ Create two data sets
 
 -   one data set that contains only county level data
 
-Note that all county measurements have the format “County Name, DD” where “DD” represents the state. This can be used to subset the data. I used the code grep(pattern = ", \\w\\w", Area_name) to get the indices corresponding to counties. For the county level data, add a class to the tibble called county. Similarly, add a class to the non-county data called state. This can be done by overwriting the class() you see on the object: class(your_county_tibble) \<- c("county", class(your_county_tibble))
-
-For the county level data, add a class to the tibble called county. Similarly, add a class to the non-county data called state. This can be done by overwriting the class() you see on the object:
-
+Note that all county measurements have the format “County Name, DD” where “DD” represents the state. This can be used to subset the data. For the county level data, add a class to the tibble called county. Similarly, add a class to the non-county data called state. 
 ```{r}
+#TODO: Hayden
+
 #For county tibble
 county_match <- grep(pattern = ", \\w\\w", long_updated$area_name)
 county_tibble <- long_updated[county_match,]
@@ -113,29 +128,27 @@ class(county_tibble) <- c("county", class(county_tibble))
 state_match <- grep(pattern = ", \\w\\w", long_updated$area_name, invert = T)
 state_tibble <- long_updated[state_match,]
 class(state_tibble) <- c("state", class(state_tibble))
-
 ```
 
 Print the first 10 rows of each tibble by including county_tibble and state_tibble in your code chunk.
-
 ```{r}
-# TODO Hayden
+#TODO: Hayden
 
 head(county_tibble, 10)
 head(state_tibble, 10)
-
 ```
 
-## Step 5: Assign State to County Tibble
+## Question 5: Assign State to County Tibble
 
 For the county level tibble, create a new variable that describes which state one of these county measurements corresponds to (the two digit abbreviation is fine, see substr()).
-
 ```{r}
+#TODO: Mike
 
-# I prefer to split the string based on delimiter (comma) instead of indexing
-# Example
+#I prefer to split the string based on delimiter (comma) instead of indexing
+#Example
 string <- "Autauga, AL"
-split <- str_split(string, ",", simplify = TRUE)[,-1] # We return a chr matrix, and we only care about the last (second) entry
+split <- str_split(string, ",", simplify = TRUE)[,-1] # We return a chr matrix, 
+# and we only care about the last (second) entry
 
 print(split)
 print("Removing space")
@@ -145,14 +158,15 @@ print(clean_split)
 ```
 
 ```{r}
-# TODO: Create state variable
-# Mike
+#Create state variable for county tibble
 
 county_tibble <- county_tibble |> 
   mutate(state = str_trim(str_split(area_name, ",", simplify = TRUE)[,-1]))
+
+county_tibble #to show that the addition of the variable was successful
 ```
 
-## Step 6: Assign Division to State Tibble
+## Question 6: Assign Division to State Tibble
 
 For the non-county level tibble, create a new variable called “division” corresponding to the state’s classification of division [here.](https://en.wikipedia.org/wiki/List_of_regions_of_the_United_States) If row corresponds to a non-state (i.e. UNITED STATES), return ERROR for the division. Hint: Use %in% and consider if_else or case_when logic.
 
@@ -161,12 +175,12 @@ Instead of writing ifelse statements manually for every division, we are going t
 We can scrape a Wikipedia table using the rvest package.
 
 Source: [StackOverflow](https://stackoverflow.com/questions/73696551/r-webscraping-error-arguments-imply-differing-number-of-rows)
-
-```{r, message=FALSE}
-# To do: Mike
+```{r, message=FALSE, warning=FALSE}
+#TODO: Mike
 library(rvest) # rvest is in the tidyverse package
-# 
+```
 
+```{r}
 # Since we don't want to always have to connect to the url to read our data, 
 # let's check if we have already saved it
 if (file.exists("data/divisions.csv")){
@@ -175,7 +189,9 @@ if (file.exists("data/divisions.csv")){
   divisions <- read_csv("data/divisions.csv", show_col_types = FALSE)
 } else {
   print("No division data found. Downloading from Wikipedia...")
-  wiki <- read_html(x = "https://en.wikipedia.org/wiki/List_of_regions_of_the_United_States", package="xml2")
+  wiki <- read_html(x =
+"https://en.wikipedia.org/wiki/List_of_regions_of_the_United_States",
+package="xml2")
   wiki |> html_elements(".wikitable") |> html_table() -> wiki_tables
   # There is only one table, so the first one will give us what we want
   divisions <- wiki_tables[1]
@@ -191,19 +207,19 @@ divisions
 Note how all states in any given region are stored in the same cell, separated by spaces. We can either transform the States column by splitting up the states or leave as is and process the state correctly when reading our other datasets.
 
 We can filter columns by the state in our divisions tibble by using if_any and str_detect.
-
 ```{r}
-# TODO: Assign division based on the state-division pairs we read in
-# Let's make a function to make this easier
+#TODO: Assign division based on the state-division pairs we read in
+#Let's make a function to make this easier
 
-divisions$States <-divisions$States |> toupper() # make sure uppercase to make matching easier
+divisions$States <-divisions$States |> toupper() # make sure uppercase 
+# to make matching easier
 
 get_division_for_state <- function(state_name){
   
   # Check for the state name in the divisions df and filter
   # Assumes state only appears once in the tibble
   # Add word boundaries to our regex to avoid substring matching
-  # E.g "Kansas" shouldnt match "Arkansas"
+  # E.g "Kansas" shouldn't match "Arkansas"
   match_pattern <- paste0("\\b", toupper(state_name), "\\b")
   division_row <- divisions |> 
     filter(if_any(States, ~str_detect(.x, match_pattern)))
@@ -223,20 +239,23 @@ get_division_for_state <- function(state_name){
 ```{r}
 # Apply our function to the non county tibble
 
-state_tibble_test <- state_tibble |> mutate(division = map_chr(area_name, get_division_for_state))
-tail(state_tibble)
+state_tibble_test <- state_tibble |> mutate(division = 
+                     map_chr(area_name, get_division_for_state))
+tail(state_tibble_test)
 ```
 
 ## Function Wrapping
 
-### Function 1: Step 1, Step 2
+## Function 1: Step 1 & Step 2
 
 Write one function that combines Steps 1 and 2 above. Give an optional argument (that is it has a default value) that allows the user to specify the name of the column representing the value (enrollment for these data sets).
-
 ```{r}
+#TODO: Hayden
 
 select_and_convert <- function(data_path_in_quotes, value_colname = "Enrollment"){
-  edu <- read_csv(data_path_in_quotes, col_select = c(Area_name, STCOU, ends_with("D")), show_col_types = FALSE) |>
+  edu <- read_csv(data_path_in_quotes, 
+                  col_select = c(Area_name, STCOU, ends_with("D")), 
+                  show_col_types = FALSE) |>
   rename(
     area_name = Area_name
   )
@@ -249,13 +268,15 @@ select_and_convert <- function(data_path_in_quotes, value_colname = "Enrollment"
   return(edu_long)
 }
 
+#making sure the function works
+function1 <- select_and_convert("data/EDU01b.csv") 
 ```
 
 ### Function 2: Step 3
 
 Write a function that takes the output from Step 2 and performs Step 3
-
 ```{r}
+#TODO: Mike
 
 get_year_and_measurement <-function(long_data){
   print("Updating long data with year and measurement")
@@ -265,16 +286,17 @@ get_year_and_measurement <-function(long_data){
     mutate(year = ifelse(year < 26, year + 2000, year + 1900))
      
   return (long_data_updated)
-
 }
 
+get_year_and_measurement(function1) #to make sure the function works
 ```
 
 ### Function 3: Step 5
 
 Write a function to do Step 5
-
 ```{r}
+#TODO: Mike
+
 get_state <- function(county_tibble){
   print("Assigning State to county tibble")
   county_tibble_with_state <- county_tibble |> 
@@ -287,34 +309,31 @@ get_state <- function(county_tibble){
 ### Function 4: Step 6
 
 Write a function to do step 6
-
 ```{r}
+#TODO: Mike
+
 get_division <- function(state_tibble){
   print("Assigning division to state tibble")
   state_tibble_with_division <- state_tibble |> 
     mutate(division = map_chr(area_name, get_division_for_state))
   
   return(state_tibble_with_division)
-
 }
-
-state_tibble
 ```
 
 ### Function 5: Step 4
 
 Write another function that takes in the output from Step 3 and creates the two tibbles in Step 4, calls the above two functions (to perform Steps 5 and 6), and returns two final tibbles.
-
 ```{r}
 #TODO: Hayden
 
-returning_final_tibbles <- function(long_updated_data){
-  county_match <- grep(pattern = ", \\w\\w", long_updated_data$area_name)
-  county_tibble <- long_updated_data[county_match,]
+returning_final_tibbles <- function(long_data_updated){
+  county_match <- grep(pattern = ", \\w\\w", long_data_updated$area_name)
+  county_tibble <- long_data_updated[county_match,]
   class(county_tibble) <- c("county", class(county_tibble))
   
-  state_match <- grep(pattern = ", \\w\\w", long_updated_data$area_name, invert = T)
-  state_tibble <- long_updated_data[state_match,]
+  state_match <- grep(pattern = ", \\w\\w", long_data_updated$area_name, invert = T)
+  state_tibble <- long_data_updated[state_match,]
   class(state_tibble) <- c("state", class(state_tibble))
   
   county_tibble_final <- get_state(county_tibble)
@@ -323,12 +342,15 @@ returning_final_tibbles <- function(long_updated_data){
   return(list(county_tibble_final, state_tibble_final))
 }
 
+#making sure the function works 
+returning_final_tibbles(get_year_and_measurement(function1))
 ```
 
-## Wrap Everything in One Function Call
+## Wrap Everything in One Function Call (Wrapper Function)
 
 ```{r}
-# In progress
+#TODO: Mike
+
 clean_data_wrapper <- function(url, value = "Enrollment"){
   result <- select_and_convert(url, value_colname = value) |>
     get_year_and_measurement() |> 
@@ -339,26 +361,49 @@ clean_data_wrapper <- function(url, value = "Enrollment"){
 
 ## Call It and Combine Data
 
+Call the function you made two times to read in and parse the two .csv files mentioned so far. Be sure to call the new value column the same in both function calls.
 ```{r}
-data <- clean_data_wrapper("https://www4.stat.ncsu.edu/~online/datasets/EDU01b.csv")
-data
+#TODO: Hayden
+
+data_a <- clean_data_wrapper("https://www4.stat.ncsu.edu/~online/datasets/EDU01a.csv")
+
+data_b <- clean_data_wrapper("https://www4.stat.ncsu.edu/~online/datasets/EDU01b.csv")
+```
+
+Write a single short function that takes in the results of two calls to your wrapper function. The function should combine the tibbles appropriately (that is the two county level data sets get combined and the two non-county level data sets get combined). This can easily be done within your function using some calls to dplyr::bind_rows(). The function should then return two data sets as one object (in the same format as the input data sets as we will be combining this output with more calls to the wrapper function in a bit).
+```{r}
+#TODO: Hayden
+
+combining_tibbles <- function(tibble1, tibble2){
+  county_tibbles_combined <- bind_rows(tibble1[[1]], tibble2[[1]])
+  state_tibbles_combined <- bind_rows(tibble1[[2]], tibble2[[2]])
+  return(list(county_tibbles_combined, state_tibbles_combined))
+}
+```
+
+Call this function to combine the result of the two calls to the wrapper function.
+```{r}
+#TODO: Hayden
+
+#saving this test to use it for testing plots later 
+test_data <- combining_tibbles(data_a, data_b)
 ```
 
 ## Write Generic Functions for Summarizing
 
-### Plotting State Data
+## Plotting State Data
 
 Let's show commas in our y-axis to make it more readable.
 
 Source: [StackOverflow](https://stackoverflow.com/questions/52602503/display-an-axis-value-in-millions-in-ggplot)
+```{r, message=FALSE, warning=FALSE}
+#TODO: Mike
 
-```{r}
 # We will use the library scales
-suppressMessages(library(scales))
+library(scales)
 ```
 
 ```{r}
-
 plot.state <- function(df, var_name = "Enrollment"){
   # Create title base on our supplied var name
   plot_title <- paste0("Mean ", var_name, " by Division")
@@ -367,7 +412,8 @@ plot.state <- function(df, var_name = "Enrollment"){
     filter(division != "ERROR") |>
     group_by(division, year) |> 
     summarize(mean_enrollment = mean(get(var_name))) |>
-    mutate(division = as.factor(division)) |> # TODO: Make this factor when reading data??
+    mutate(division = as.factor(division)) |> 
+    # TODO: Make this factor when reading data??
     # Plotting functions
     ggplot(aes(year,mean_enrollment, color = division)) +
     geom_line() + 
@@ -378,18 +424,25 @@ plot.state <- function(df, var_name = "Enrollment"){
 }
 ```
 
-```{r}
+```{r, eval = FALSE, echo = FALSE}
+#TODO: Hayden
+
+#Test out this function. 
+#(This doesn’t need to go into the report here, just make sure it is working!)
+
 # Testing with wrapper data
-plot(data[[2]])
+plot(test_data[[2]])
 ```
 
-### Plotting County Data
+## Plotting County Data
 
 ```{r}
 state.name[match("North Carolina", state.abb)]
 ```
 
 ```{r}
+#TODO: Mike 
+
 plot.county <- function(df, var_name = "Enrollment", 
                         state = "NC", 
                         top_or_bottom = "top", n = 5){
@@ -423,7 +476,9 @@ plot.county <- function(df, var_name = "Enrollment",
   counties <- df |> 
     filter({{state}} == state ) |>
     group_by(area_name) |> 
-    summarize(mean_enrollment = mean(get(var_name))) |> display_function(mean_enrollment, top_or_bottom) |> head(n)
+    summarize(mean_enrollment = mean(get(var_name))) |>
+    display_function(mean_enrollment, top_or_bottom) |> 
+    head(n)
   
   # Filter df by counties and plot
   df |> filter(df$area_name %in% counties$area_name) |> group_by(year, area_name) |>
@@ -433,16 +488,115 @@ plot.county <- function(df, var_name = "Enrollment",
     guides(color = guide_legend("Location")) + 
     scale_y_continuous(label=comma)
 }
-
 ```
 
-```{r}
-# Test Functions
-plot(county_tibble, top_or_bottom = "top", n = 2, state = "NC")
+
+```{r, eval = FALSE, echo = FALSE}
+#TODO: Hayden
+
+# Test out this function. 
+# Run it a few more times specifying different input arguments.
+# (This doesn’t need to go into the report here, 
+# just make sure it is working!)
+
+# again, not in the report 
+# Test Function
+plot(test_data[[1]], top_or_bottom = "top", n = 2, state = "NC")
 ```
 
 ## Put It Together
 
+Run your data processing function on the two enrollment URLs given previously, specifying an appropriate name for the enrollment data column.
 ```{r}
 #TODO Hayden
+
+data1 <- clean_data_wrapper("https://www4.stat.ncsu.edu/~online/datasets/EDU01a.csv")
+
+data2 <- clean_data_wrapper("https://www4.stat.ncsu.edu/~online/datasets/EDU01b.csv")
+```
+
+Run your data combining function to put these into one object (with two data frames)
+
+```{r}
+one_object <- combining_tibbles(data1, data2)
+```
+
+(Use appropriate indexing (ex. [[1]]) to reference the correct data frame)
+
+Use the plot function on the state data frame
+
+```{r}
+plot(one_object[[2]])
+```
+
+Use the plot function on the county data frame
+
+– Once specifying the state to be “NC”, the group being the top, the number looked at being 20
+```{r}
+plot(one_object[[1]], top_or_bottom = "top", n = 20, state = "NC")
+```
+
+– Once specifying the state to be “SC”, the group being the bottom, the number looked at being 7
+```{r}
+plot(one_object[[1]], top_or_bottom = "bottom", n = 7, state = "SC")
+```
+
+– Once without specifying anything (defaults used)
+```{r}
+plot(one_object[[1]])
+```
+
+– Once specifying the state to be “PA”, the group being the top, the number looked at being 8
+```{r}
+plot(one_object[[1]], top_or_bottom = "top", n = 8, state = "PA")
+```
+
+Lastly, read in another couple similar data sets and apply your functions!
+
+Run your data processing function on the four data sets at URLs given.
+```{r}
+dataPa <- clean_data_wrapper("https://www4.stat.ncsu.edu/~online/datasets/PST01a.csv")
+
+dataPb <- clean_data_wrapper("https://www4.stat.ncsu.edu/~online/datasets/PST01b.csv")
+
+dataPc <- clean_data_wrapper("https://www4.stat.ncsu.edu/~online/datasets/PST01c.csv")
+
+dataPd <- clean_data_wrapper("https://www4.stat.ncsu.edu/~online/datasets/PST01d.csv")
+```
+
+Run your data combining function (probably three times) to put these into one object (with two data frames)
+```{r}
+once <- combining_tibbles(dataPa, dataPb)
+
+twice <- combining_tibbles(once, dataPc)
+
+thrice <- combining_tibbles(twice, dataPd)
+```
+
+Use the plot function on the state data frame
+
+```{r}
+plot(thrice[[2]])
+```
+
+Use the plot function on the county data frame
+– Once specifying the state to be “CA”, the group being the top, the number looked at being 15
+
+```{r}
+plot(thrice[[1]], top_or_bottom = "top", n = 15, state = "CA")
+```
+
+– Once specifying the state to be “TX”, the group being the top, the number looked at being 4
+```{r}
+plot(thrice[[1]], top_or_bottom = "top", n = 4, state = "TX")
+```
+
+– Once without specifying anything (defaults used)
+```{r}
+plot(thrice[[1]])
+```
+
+– Once specifying the state to be “NY”, the group being the top, the number looked at being 10
+```{r}
+plot(thrice[[1]], top_or_bottom = "top", n = 10, state = "NY")
 ```
