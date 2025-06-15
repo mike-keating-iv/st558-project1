@@ -11,32 +11,32 @@ editor: visual
 
 ## Creating the Repo
 
-- GitHub repo created by Mike 
+-   GitHub repo created by Mike
 
-- RStudio project created
+-   RStudio project created
 
-- Hayden added as a collaborator and membership accepted
+-   Hayden added as a collaborator and membership accepted
 
-- Format set to PDF 
+-   Format set to PDF
 
 ## Collaboration Workflow
 
-- Task distribution and timeline established
+-   Task distribution and timeline established
 
-- Decided to each work on own branches 
+-   Decided to each work on own branches
 
 ## .qmd Format
 
-All messages and warnings that come from librarying packages should be turned off using the appropriate
-code chunk option.
+All messages and warnings that come from librarying packages should be turned off using the appropriate code chunk option.
+
 ```{r, message=FALSE, warning=FALSE}
 library("tidyverse")
 library("ggplot2")
 ```
 
-## First Steps 
+## First Steps
 
-## Question 1: Selecting Columns 
+## Question 1: Selecting Columns
 
 Read in one section of the data. This data is available at <https://www4.stat.ncsu.edu/~online/datasets/EDU01a.csv>.
 
@@ -47,6 +47,7 @@ Select only the following columns:
 -   STCOU
 
 -   Any column that ends in "D"
+
 ```{r}
 
 #NOTE: EDU01a, EDU01b, divisions, and Mastdata files are all in the project folder. 
@@ -60,6 +61,7 @@ edu01a <- read_csv("data/EDU01a.csv",
 ```
 
 Display the first 5 rows of your new data set to show that you created this correctly. Note: Do not save over your new data set with just the first 5 rows, simply just show the first 5 rows.
+
 ```{r}
 
 head(edu01a, 5)
@@ -68,6 +70,7 @@ head(edu01a, 5)
 ## Question 2: Converting to Long Format
 
 Convert the data into long format where each row has only one enrollment value for that Area_name. Display the first 5 rows of your new data set to show that you created this correctly.
+
 ```{r}
 edu01a_long <- edu01a |>
                   pivot_longer(cols = 3:12, #retain area_name + STCOU
@@ -87,20 +90,7 @@ One of the new columns should now correspond to the old column names that end wi
 
 -   Grab the first three characters and following four digits to create a new variable representing which measurement was grabbed.
 
--   Hint: Check out the substr() function from base r
-    ```{r}
-
-    # Parse the string to pull out year
-    # It looks like every year is pre-2000, but let's plan for up to 2025
-    # This assumes there is no data from 1925 or earlier
-    # Treating year as numeric for now
-long_updated <- edu01a_long |> mutate(year = as.numeric(substr(EDU_D, 8,9)), 
-      measurement = substr(EDU_D, 1,7)) |> 
-      mutate(year = ifelse(year < 26, year + 2000, year + 1900))
-
-    head(long_updated)
-
-    ```
+-   Hint: Check out the substr() function from base r `f3175f2a-e8a0-4436-be12-b33925b6d220     31b8e172-b470-440e-83d8-e6b185028602:dAB5AHAAZQA6AFoAZwBBAHoAQQBEAEUAQQBOAHcAQQAxAEEARwBZAEEATQBnAEIAaABBAEMAMABBAFoAUQBBADQAQQBHAEUAQQBNAEEAQQB0AEEARABRAEEATgBBAEEAegBBAEQAWQBBAEwAUQBCAGkAQQBHAFUAQQBNAFEAQQB5AEEAQwAwAEEAWQBnAEEAegBBAEQATQBBAE8AUQBBAHkAQQBEAFUAQQBZAGcAQQAyAEEARwBRAEEATQBnAEEAeQBBAEQAQQBBAAoAcABvAHMAaQB0AGkAbwBuADoATQBnAEEAMwBBAEQAVQBBAE4AdwBBAD0ACgBwAHIAZQBmAGkAeAA6AEkAQQBBAGcAQQBDAEEAQQBJAEEAQQA9AAoAcwBvAHUAcgBjAGUAOgBZAEEAQgBnAEEARwBBAEEAZQB3AEIAeQBBAEgAMABBAEMAZwBBAEsAQQBDAEEAQQBJAEEAQQBnAEEAQwBBAEEASQB3AEEAZwBBAEYAQQBBAFkAUQBCAHkAQQBIAE0AQQBaAFEAQQBnAEEASABRAEEAYQBBAEIAbABBAEMAQQBBAGMAdwBCADAAQQBIAEkAQQBhAFEAQgB1AEEARwBjAEEASQBBAEIAMABBAEcAOABBAEkAQQBCAHcAQQBIAFUAQQBiAEEAQgBzAEEAQwBBAEEAYgB3AEIAMQBBAEgAUQBBAEkAQQBCADUAQQBHAFUAQQBZAFEAQgB5AEEAQQBvAEEASQBBAEEAZwBBAEMAQQBBAEkAQQBBAGoAQQBDAEEAQQBTAFEAQgAwAEEAQwBBAEEAYgBBAEIAdgBBAEcAOABBAGEAdwBCAHoAQQBDAEEAQQBiAEEAQgBwAEEARwBzAEEAWgBRAEEAZwBBAEcAVQBBAGQAZwBCAGwAQQBIAEkAQQBlAFEAQQBnAEEASABrAEEAWgBRAEIAaABBAEgASQBBAEkAQQBCAHAAQQBIAE0AQQBJAEEAQgB3AEEASABJAEEAWgBRAEEAdABBAEQASQBBAE0AQQBBAHcAQQBEAEEAQQBMAEEAQQBnAEEARwBJAEEAZABRAEIAMABBAEMAQQBBAGIAQQBCAGwAQQBIAFEAQQBKAHcAQgB6AEEAQwBBAEEAYwBBAEIAcwBBAEcARQBBAGIAZwBBAGcAQQBHAFkAQQBiAHcAQgB5AEEAQwBBAEEAZABRAEIAdwBBAEMAQQBBAGQAQQBCAHYAQQBDAEEAQQBNAGcAQQB3AEEARABJAEEATgBRAEEASwBBAEMAQQBBAEkAQQBBAGcAQQBDAEEAQQBJAHcAQQBnAEEARgBRAEEAYQBBAEIAcABBAEgATQBBAEkAQQBCAGgAQQBIAE0AQQBjAHcAQgAxAEEARwAwAEEAWgBRAEIAegBBAEMAQQBBAGQAQQBCAG8AQQBHAFUAQQBjAGcAQgBsAEEAQwBBAEEAYQBRAEIAegBBAEMAQQBBAGIAZwBCAHYAQQBDAEEAQQBaAEEAQgBoAEEASABRAEEAWQBRAEEAZwBBAEcAWQBBAGMAZwBCAHYAQQBHADAAQQBJAEEAQQB4AEEARABrAEEATQBnAEEAMQBBAEMAQQBBAGIAdwBCAHkAQQBDAEEAQQBaAFEAQgBoAEEASABJAEEAYgBBAEIAcABBAEcAVQBBAGMAZwBBAEsAQQBDAEEAQQBJAEEAQQBnAEEAQwBBAEEASQB3AEEAZwBBAEYAUQBBAGMAZwBCAGwAQQBHAEUAQQBkAEEAQgBwAEEARwA0AEEAWgB3AEEAZwBBAEgAawBBAFoAUQBCAGgAQQBIAEkAQQBJAEEAQgBoAEEASABNAEEASQBBAEIAdQBBAEgAVQBBAGIAUQBCAGwAQQBIAEkAQQBhAFEAQgBqAEEAQwBBAEEAWgBnAEIAdgBBAEgASQBBAEkAQQBCAHUAQQBHADgAQQBkAHcAQQBLAEEARwB3AEEAYgB3AEIAdQBBAEcAYwBBAFgAdwBCADEAQQBIAEEAQQBaAEEAQgBoAEEASABRAEEAWgBRAEIAawBBAEMAQQBBAFAAQQBBAHQAQQBDAEEAQQBaAFEAQgBrAEEASABVAEEATQBBAEEAeABBAEcARQBBAFgAdwBCAHMAQQBHADgAQQBiAGcAQgBuAEEAQwBBAEEAZgBBAEEAKwBBAEMAQQBBAGIAUQBCADEAQQBIAFEAQQBZAFEAQgAwAEEARwBVAEEASwBBAEIANQBBAEcAVQBBAFkAUQBCAHkAQQBDAEEAQQBQAFEAQQBnAEEARwBFAEEAYwB3AEEAdQBBAEcANABBAGQAUQBCAHQAQQBHAFUAQQBjAGcAQgBwAEEARwBNAEEASwBBAEIAegBBAEgAVQBBAFkAZwBCAHoAQQBIAFEAQQBjAGcAQQBvAEEARQBVAEEAUgBBAEIAVgBBAEYAOABBAFIAQQBBAHMAQQBDAEEAQQBPAEEAQQBzAEEARABrAEEASwBRAEEAcABBAEMAdwBBAEkAQQBBAEsAQQBDAEEAQQBJAEEAQQBnAEEAQwBBAEEASQBBAEEAZwBBAEcAMABBAFoAUQBCAGgAQQBIAE0AQQBkAFEAQgB5AEEARwBVAEEAYgBRAEIAbABBAEcANABBAGQAQQBBAGcAQQBEADAAQQBJAEEAQgB6AEEASABVAEEAWQBnAEIAegBBAEgAUQBBAGMAZwBBAG8AQQBFAFUAQQBSAEEAQgBWAEEARgA4AEEAUgBBAEEAcwBBAEMAQQBBAE0AUQBBAHMAQQBEAGMAQQBLAFEAQQBwAEEAQwBBAEEAZgBBAEEAKwBBAEMAQQBBAEMAZwBBAGcAQQBDAEEAQQBJAEEAQQBnAEEAQwBBAEEASQBBAEIAdABBAEgAVQBBAGQAQQBCAGgAQQBIAFEAQQBaAFEAQQBvAEEASABrAEEAWgBRAEIAaABBAEgASQBBAEkAQQBBADkAQQBDAEEAQQBhAFEAQgBtAEEARwBVAEEAYgBBAEIAegBBAEcAVQBBAEsAQQBCADUAQQBHAFUAQQBZAFEAQgB5AEEAQwBBAEEAUABBAEEAZwBBAEQASQBBAE4AZwBBAHMAQQBDAEEAQQBlAFEAQgBsAEEARwBFAEEAYwBnAEEAZwBBAEMAcwBBAEkAQQBBAHkAQQBEAEEAQQBNAEEAQQB3AEEAQwB3AEEASQBBAEIANQBBAEcAVQBBAFkAUQBCAHkAQQBDAEEAQQBLAHcAQQBnAEEARABFAEEATwBRAEEAdwBBAEQAQQBBAEsAUQBBAHAAQQBBAG8AQQBDAGcAQQBnAEEAQwBBAEEASQBBAEEAZwBBAEcAZwBBAFoAUQBCAGgAQQBHAFEAQQBLAEEAQgBzAEEARwA4AEEAYgBnAEIAbgBBAEYAOABBAGQAUQBCAHcAQQBHAFEAQQBZAFEAQgAwAEEARwBVAEEAWgBBAEEAcABBAEEAbwBBAEMAZwBBAGcAQQBDAEEAQQBJAEEAQQBnAEEARwBBAEEAWQBBAEIAZwBBAEEAPQA9AAoAcwB1AGYAZgBpAHgAOgA=:31b8e172-b470-440e-83d8-e6b185028602`
 
 ## Question 4: Split County and Non-County
 
@@ -110,7 +100,8 @@ Create two data sets
 
 -   one data set that contains only county level data
 
-Note that all county measurements have the format “County Name, DD” where “DD” represents the state. This can be used to subset the data. For the county level data, add a class to the tibble called county. Similarly, add a class to the non-county data called state. 
+Note that all county measurements have the format “County Name, DD” where “DD” represents the state. This can be used to subset the data. For the county level data, add a class to the tibble called county. Similarly, add a class to the non-county data called state.
+
 ```{r}
 
 #For county tibble
@@ -125,6 +116,7 @@ class(state_tibble) <- c("state", class(state_tibble))
 ```
 
 Print the first 10 rows of each tibble by including county_tibble and state_tibble in your code chunk.
+
 ```{r}
 head(county_tibble, 10)
 head(state_tibble, 10)
@@ -133,6 +125,7 @@ head(state_tibble, 10)
 ## Question 5: Assign State to County Tibble
 
 For the county level tibble, create a new variable that describes which state one of these county measurements corresponds to (the two digit abbreviation is fine, see substr()).
+
 ```{r}
 #I prefer to split the string based on delimiter (comma) instead of indexing
 #Example
@@ -165,6 +158,7 @@ Instead of writing ifelse statements manually for every division, we are going t
 We can scrape a Wikipedia table using the rvest package.
 
 Source: [StackOverflow](https://stackoverflow.com/questions/73696551/r-webscraping-error-arguments-imply-differing-number-of-rows)
+
 ```{r, message=FALSE, warning=FALSE}
 library(rvest) # rvest is in the tidyverse package
 ```
@@ -196,6 +190,7 @@ divisions
 Note how all states in any given region are stored in the same cell, separated by spaces. We can either transform the States column by splitting up the states or leave as is and process the state correctly when reading our other datasets.
 
 We can filter columns by the state in our divisions tibble by using if_any and str_detect.
+
 ```{r}
 
 # Make uppercase to improve matching
@@ -236,6 +231,7 @@ tail(state_tibble_test)
 ## Function 1: Step 1 & Step 2
 
 Write one function that combines Steps 1 and 2 above. Give an optional argument (that is it has a default value) that allows the user to specify the name of the column representing the value (enrollment for these data sets).
+
 ```{r}
 
 select_and_convert <- function(data_path_in_quotes, value_colname = "Enrollment"){
@@ -261,6 +257,7 @@ function1 <- select_and_convert("data/EDU01b.csv")
 ### Function 2: Step 3
 
 Write a function that takes the output from Step 2 and performs Step 3
+
 ```{r}
 
 get_year_and_measurement <-function(long_data){
@@ -279,6 +276,7 @@ get_year_and_measurement(function1) #to make sure the function works
 ### Function 3: Step 5
 
 Write a function to do Step 5
+
 ```{r}
 
 get_state <- function(county_tibble){
@@ -293,6 +291,7 @@ get_state <- function(county_tibble){
 ### Function 4: Step 6
 
 Write a function to do step 6
+
 ```{r}
 
 get_division <- function(state_tibble){
@@ -307,6 +306,7 @@ get_division <- function(state_tibble){
 ### Function 5: Step 4
 
 Write another function that takes in the output from Step 3 and creates the two tibbles in Step 4, calls the above two functions (to perform Steps 5 and 6), and returns two final tibbles.
+
 ```{r}
 
 
@@ -344,6 +344,7 @@ clean_data_wrapper <- function(url, value = "Enrollment"){
 ## Call It and Combine Data
 
 Call the function you made two times to read in and parse the two .csv files mentioned so far. Be sure to call the new value column the same in both function calls.
+
 ```{r}
 
 data_a <- clean_data_wrapper("https://www4.stat.ncsu.edu/~online/datasets/EDU01a.csv")
@@ -352,6 +353,7 @@ data_b <- clean_data_wrapper("https://www4.stat.ncsu.edu/~online/datasets/EDU01b
 ```
 
 Write a single short function that takes in the results of two calls to your wrapper function. The function should combine the tibbles appropriately (that is the two county level data sets get combined and the two non-county level data sets get combined). This can easily be done within your function using some calls to dplyr::bind_rows(). The function should then return two data sets as one object (in the same format as the input data sets as we will be combining this output with more calls to the wrapper function in a bit).
+
 ```{r}
 
 combining_tibbles <- function(tibble1, tibble2){
@@ -362,6 +364,7 @@ combining_tibbles <- function(tibble1, tibble2){
 ```
 
 Call this function to combine the result of the two calls to the wrapper function.
+
 ```{r}
 
 #saving this test to use it for testing plots later 
@@ -375,6 +378,7 @@ test_data <- combining_tibbles(data_a, data_b)
 Let's show commas in our y-axis to make it more readable.
 
 Source: [StackOverflow](https://stackoverflow.com/questions/52602503/display-an-axis-value-in-millions-in-ggplot)
+
 ```{r, message=FALSE, warning=FALSE}
 # We will use the library scales
 library(scales)
@@ -411,7 +415,6 @@ plot(test_data[[2]])
 ```
 
 ## Plotting County Data
-
 
 ```{r}
 
@@ -455,14 +458,14 @@ plot.county <- function(df, var_name = "Enrollment",
   
   # Filter df by counties and plot
   df |> filter(df$area_name %in% counties$area_name) |> group_by(year, area_name) |>
-    mutate(mean_enrollment = mean(get(var_name))) |>
-    ggplot(aes(year,mean_enrollment, color = area_name)) + geom_line() + 
-    labs(title = plot_title, x = "Year", y = paste0("Mean ", var_name)) +
+    ggplot(aes(year,get(var_name), color = area_name)) + geom_line() + 
+    labs(title = plot_title, x = "Year", y = paste0(var_name)) +
     guides(color = guide_legend("Location")) + 
     scale_y_continuous(label=comma) 
+
+
 }
 ```
-
 
 ```{r, eval = FALSE, echo = FALSE}
 
@@ -479,6 +482,7 @@ plot(test_data[[1]], top_or_bottom = "top", n = 2, state = "NC")
 ## Put It Together
 
 Run your data processing function on the two enrollment URLs given previously, specifying an appropriate name for the enrollment data column.
+
 ```{r}
 
 
@@ -493,7 +497,7 @@ Run your data combining function to put these into one object (with two data fra
 one_object <- combining_tibbles(data1, data2)
 ```
 
-(Use appropriate indexing (ex. [[1]]) to reference the correct data frame)
+(Use appropriate indexing (ex. \[\[1\]\]) to reference the correct data frame)
 
 Use the plot function on the state data frame
 
@@ -504,21 +508,25 @@ plot(one_object[[2]])
 Use the plot function on the county data frame
 
 – Once specifying the state to be “NC”, the group being the top, the number looked at being 20
+
 ```{r}
 plot(one_object[[1]], top_or_bottom = "top", n = 20, state = "NC")
 ```
 
 – Once specifying the state to be “SC”, the group being the bottom, the number looked at being 7
+
 ```{r}
 plot(one_object[[1]], top_or_bottom = "bottom", n = 7, state = "SC")
 ```
 
 – Once without specifying anything (defaults used)
+
 ```{r}
 plot(one_object[[1]])
 ```
 
 – Once specifying the state to be “PA”, the group being the top, the number looked at being 8
+
 ```{r}
 plot(one_object[[1]], top_or_bottom = "top", n = 8, state = "PA")
 ```
@@ -526,6 +534,7 @@ plot(one_object[[1]], top_or_bottom = "top", n = 8, state = "PA")
 Lastly, read in another couple similar data sets and apply your functions!
 
 Run your data processing function on the four data sets at URLs given.
+
 ```{r}
 dataPa <- clean_data_wrapper("https://www4.stat.ncsu.edu/~online/datasets/PST01a.csv")
 
@@ -537,6 +546,7 @@ dataPd <- clean_data_wrapper("https://www4.stat.ncsu.edu/~online/datasets/PST01d
 ```
 
 Run your data combining function (probably three times) to put these into one object (with two data frames)
+
 ```{r}
 once <- combining_tibbles(dataPa, dataPb)
 
@@ -551,24 +561,26 @@ Use the plot function on the state data frame
 plot(thrice[[2]])
 ```
 
-Use the plot function on the county data frame
-– Once specifying the state to be “CA”, the group being the top, the number looked at being 15
+Use the plot function on the county data frame – Once specifying the state to be “CA”, the group being the top, the number looked at being 15
 
 ```{r}
 plot(thrice[[1]], top_or_bottom = "top", n = 15, state = "CA")
 ```
 
 – Once specifying the state to be “TX”, the group being the top, the number looked at being 4
+
 ```{r}
 plot(thrice[[1]], top_or_bottom = "top", n = 4, state = "TX")
 ```
 
 – Once without specifying anything (defaults used)
+
 ```{r}
 plot(thrice[[1]])
 ```
 
 – Once specifying the state to be “NY”, the group being the top, the number looked at being 10
+
 ```{r}
 plot(thrice[[1]], top_or_bottom = "top", n = 10, state = "NY")
 ```
