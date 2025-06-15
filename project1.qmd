@@ -98,7 +98,9 @@ One of the new columns should now correspond to the old column names that end wi
 # It looks like every year is pre-2000, but lets plan for up to 2025
 # This assumes there is no data from 1925 or earlier
 # Treating year as numeric for now
-long_updated <- edu01a_long |> mutate(year = as.numeric(substr(EDU_D, 8,9)), measurement = substr(EDU_D, 1,7)) |> 
+long_updated <- edu01a_long |> 
+  mutate(year = as.numeric(substr(EDU_D, 8,9)), 
+         measurement = substr(EDU_D, 1,7)) |> 
   mutate(year = ifelse(year < 26, year + 2000, year + 1900))
 
 head(long_updated)
@@ -176,7 +178,7 @@ Source: [StackOverflow](https://stackoverflow.com/questions/73696551/r-webscrapi
 library(rvest) # rvest is in the tidyverse package
 ```
 
-```{r}
+```{r, message=FALSE}
 # Since we don't want to always have to connect to the url to read our data, 
 # let's check if we have already saved it
 if (file.exists("data/divisions.csv")){
@@ -247,7 +249,8 @@ Write one function that combines Steps 1 and 2 above. Give an optional argument 
 
 ```{r}
 
-select_and_convert <- function(data_path_in_quotes, value_colname = "Enrollment"){
+select_and_convert <- function(data_path_in_quotes, 
+                               value_colname = "Enrollment"){
   edu <- read_csv(data_path_in_quotes, 
                   col_select = c(Area_name, STCOU, ends_with("D")), 
                   show_col_types = FALSE) |>
@@ -328,7 +331,8 @@ returning_final_tibbles <- function(long_data_updated){
   county_tibble <- long_data_updated[county_match,]
   class(county_tibble) <- c("county", class(county_tibble))
   
-  state_match <- grep(pattern = ", \\w\\w", long_data_updated$area_name, invert = T)
+  state_match <- grep(pattern = ", \\w\\w", 
+                      long_data_updated$area_name, invert = T)
   state_tibble <- long_data_updated[state_match,]
   class(state_tibble) <- c("state", class(state_tibble))
   
