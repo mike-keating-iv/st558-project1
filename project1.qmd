@@ -369,6 +369,8 @@ Call this function to combine the result of the two calls to the wrapper functio
 
 #saving this test to use it for testing plots later 
 test_data <- combining_tibbles(data_a, data_b)
+
+test_data #to show that it worked 
 ```
 
 ## Write Generic Functions for Summarizing
@@ -457,10 +459,11 @@ plot.county <- function(df, var_name = "Enrollment",
     head(n)
   
   # Filter df by counties and plot
+  # 2 cols for legend so that it's not cut off at the top
   df |> filter(df$area_name %in% counties$area_name) |> group_by(year, area_name) |>
     ggplot(aes(year,get(var_name), color = area_name)) + geom_line() + 
     labs(title = plot_title, x = "Year", y = paste0(var_name)) +
-    guides(color = guide_legend("Location")) + 
+    guides(color = guide_legend("Location", ncol = 2)) + 
     scale_y_continuous(label=comma) 
 
 
