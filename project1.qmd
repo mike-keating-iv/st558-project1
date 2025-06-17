@@ -556,14 +556,20 @@ Lastly, read in another couple similar data sets and apply your functions!
 
 Run your data processing function on the four data sets at URLs given.
 
+After referring to the Mastdata spreadsheet, We must note that the data below corresponds to "Resident Total Population" estimates, rather than enrollment. So, we will pass the approprriate value to our wrapper functions.
+
 ```{r}
-dataPa <- clean_data_wrapper("https://www4.stat.ncsu.edu/~online/datasets/PST01a.csv")
+dataPa <- clean_data_wrapper("https://www4.stat.ncsu.edu/~online/datasets/PST01a.csv", 
+                             value = "Resident Population")
 
-dataPb <- clean_data_wrapper("https://www4.stat.ncsu.edu/~online/datasets/PST01b.csv")
+dataPb <- clean_data_wrapper("https://www4.stat.ncsu.edu/~online/datasets/PST01b.csv", 
+                             value = "Resident Population")
 
-dataPc <- clean_data_wrapper("https://www4.stat.ncsu.edu/~online/datasets/PST01c.csv")
+dataPc <- clean_data_wrapper("https://www4.stat.ncsu.edu/~online/datasets/PST01c.csv", 
+                             value = "Resident Population")
 
-dataPd <- clean_data_wrapper("https://www4.stat.ncsu.edu/~online/datasets/PST01d.csv")
+dataPd <- clean_data_wrapper("https://www4.stat.ncsu.edu/~online/datasets/PST01d.csv", 
+                             value = "Resident Population")
 ```
 
 Run your data combining function (probably three times) to put these into one object (with two data frames)
@@ -579,29 +585,47 @@ thrice <- combining_tibbles(twice, dataPd)
 Use the plot function on the state data frame
 
 ```{r}
-plot(thrice[[2]])
+plot(thrice[[2]], var_name = "Resident Population")
 ```
 
 Use the plot function on the county data frame – Once specifying the state to be “CA”, the group being the top, the number looked at being 15
 
 ```{r}
-plot(thrice[[1]], top_or_bottom = "top", n = 15, state = "CA")
+plot(thrice[[1]], top_or_bottom = "top", n = 15, state = "CA", 
+     var_name = "Resident Population")
 ```
 
 – Once specifying the state to be “TX”, the group being the top, the number looked at being 4
 
 ```{r}
-plot(thrice[[1]], top_or_bottom = "top", n = 4, state = "TX")
+plot(thrice[[1]], top_or_bottom = "top", n = 4, state = "TX", 
+     var_name = "Resident Population")
 ```
 
 – Once without specifying anything (defaults used)
 
 ```{r}
-plot(thrice[[1]])
+# Note: Using the default of "Enrollment" will throw an error since our wrapper 
+#function was called "Resident Population"
+# We will run it here to show the error, and then once with the correct values
+tryCatch(
+  {plot(thrice[[1]])},
+  error = function(e) {
+    print(e)
+  }
+)
+ 
 ```
+
+```{r}
+plot(thrice[[1]], var_name = "Resident Population")
+```
+
 
 – Once specifying the state to be “NY”, the group being the top, the number looked at being 10
 
 ```{r}
-plot(thrice[[1]], top_or_bottom = "top", n = 10, state = "NY")
+plot(thrice[[1]], top_or_bottom = "top", n = 10, state = "NY", 
+     var_name = "Resident Population")
 ```
+One thing to note in the graph above are the large spikes/drops in the 1990s - this would warrant further investigation and is a perfect example why EDA is important.
